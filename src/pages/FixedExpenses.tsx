@@ -4,7 +4,12 @@ import { FixedExpensesConfirmation } from "../components/FixedExpensesConfirmati
 import { useAuth } from "../hooks/useAuth";
 import { useMonthData } from "../hooks/useMonthData";
 import { useFixedConfirmations } from "../hooks/useFixedConfirmations";
-import { addFixedExpense, deleteFixedExpense, endFixedExpense } from "../services/fixedExpenses";
+import {
+  addFixedExpense,
+  deleteFixedExpense,
+  endFixedExpense,
+  updateFixedExpenseCategory,
+} from "../services/fixedExpenses";
 import { currentMonthKey } from "../types";
 
 export function FixedExpenses() {
@@ -27,6 +32,7 @@ export function FixedExpenses() {
         items={allFixed}
         onEnd={(id) => endFixedExpense(user.uid, id, currentMonthKey())}
         onDelete={(id) => deleteFixedExpense(user.uid, id)}
+        onCategoryChange={(id, category) => updateFixedExpenseCategory(user.uid, id, category)}
       />
     </div>
   );

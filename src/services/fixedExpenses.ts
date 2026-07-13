@@ -10,7 +10,7 @@ import {
   type Unsubscribe,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import type { FixedExpense, FixedExpenseInput, MonthKey } from "../types";
+import type { AnyCategory, FixedExpense, FixedExpenseInput, MonthKey } from "../types";
 
 // Dados isolados por utilizador: users/{uid}/fixedExpenses/{id}
 const fixedCol = (uid: string) => collection(db, "users", uid, "fixedExpenses");
@@ -28,6 +28,10 @@ export function listenFixedExpenses(
 
 export async function addFixedExpense(uid: string, input: FixedExpenseInput): Promise<void> {
   await addDoc(fixedCol(uid), { ...input, createdAt: Date.now() });
+}
+
+export async function updateFixedExpenseCategory(uid: string, id: string, category: AnyCategory): Promise<void> {
+  await updateDoc(doc(db, "users", uid, "fixedExpenses", id), { category });
 }
 
 /** Termina a recorrência: deixa de contar a partir do mês seguinte ao indicado. */

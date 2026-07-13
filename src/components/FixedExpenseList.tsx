@@ -1,12 +1,13 @@
-import { formatCurrency, type FixedExpense } from "../types";
+import { CATEGORIES, SAVINGS_CATEGORIES, formatCurrency, type AnyCategory, type FixedExpense } from "../types";
 
 interface Props {
   items: FixedExpense[];
   onEnd: (id: string) => void;
   onDelete: (id: string) => void;
+  onCategoryChange: (id: string, category: AnyCategory) => void;
 }
 
-export function FixedExpenseList({ items, onEnd, onDelete }: Props) {
+export function FixedExpenseList({ items, onEnd, onDelete, onCategoryChange }: Props) {
   if (items.length === 0) {
     return <p className="py-8 text-center text-sm text-slate-400">Sem despesas fixas registadas.</p>;
   }
@@ -17,10 +18,27 @@ export function FixedExpenseList({ items, onEnd, onDelete }: Props) {
           <div className="min-w-0 flex-1">
             <p className="truncate font-medium">{f.description}</p>
             <p className="text-xs text-slate-500">
-              {f.category} · desde {f.startMonth}
+              desde {f.startMonth}
               {f.endMonth ? ` · terminou em ${f.endMonth}` : " · ativa"}
             </p>
           </div>
+          <select
+            className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:border-indigo-500 focus:outline-none"
+            value={f.category}
+            onChange={(e) => onCategoryChange(f.id, e.target.value as AnyCategory)}
+            aria-label={`Categoria de ${f.description}`}
+          >
+            <optgroup label="Despesas">
+              {CATEGORIES.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Poupança">
+              {SAVINGS_CATEGORIES.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </optgroup>
+          </select>
           <span className="font-semibold">{formatCurrency(f.amount)}/mês</span>
           {f.endMonth === null && (
             <button
