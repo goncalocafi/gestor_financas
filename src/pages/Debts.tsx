@@ -1,8 +1,7 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { MonthPicker } from "../components/MonthPicker";
 import { useAuth } from "../hooks/useAuth";
-import { useMonthData } from "../hooks/useMonthData";
-import { addDebt, addDebtInstallments, deleteDebt, registerPayment } from "../services/debts";
+import { addDebt, addDebtInstallments, deleteDebt, listenAllDebts, registerPayment } from "../services/debts";
 import { debtOutstanding, formatCurrency, type Debt, type DebtPayment, type MonthKey } from "../types";
 
 interface Props {
@@ -127,12 +126,21 @@ function DebtItem({
 
 export function Debts({ month, onMonthChange }: Props) {
   const { user } = useAuth();
-  const { debts } = useMonthData(month);
+  const [allDebts, setAllDebts] = useState<Debt[]>([]);
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(today());
   const [installments, setInstallments] = useState(1);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    return listenAllDebts(user.uid, setAllDebts);
+  }, [user]);
+
+  // Mostra as dívidas do mês selecionado + todas as pendentes de meses
+  // anteriores, para que continuem visíveis até serem saldadas.
+  const debts = allDebts.filter((d) => d.date.slice(0, 7) === month || debtOutstanding(d) > 0);
 
   if (!user) return null;
 
@@ -161,8 +169,8 @@ export function Debts({ month, onMonthChange }: Props) {
     <div className="space-y-4">
       <MonthPicker value={month} onChange={onMonthChange} />
       <p className="text-sm text-slate-500">
-        O valor ainda em dívida conta para o total do mês em que emprestaste; ao abateres os
-        pagamentos recebidos, o total desce automaticamente.
+        As dívidas pendentes ficam sempre visíveis aqui, mesmo de meses anteriores, até ficarem
+        saldadas. No entanto, só contam como despesa no total do mês em que emprestaste.
       </p>
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-3 rounded-2xl bg-white p-4 shadow-sm">
         <input
@@ -203,7 +211,7 @@ export function Debts({ month, onMonthChange }: Props) {
         </button>
       </form>
       {debts.length === 0 ? (
-        <p className="py-8 text-center text-sm text-slate-400">Ninguém te deve nada neste mês. 🎉</p>
+        <p className="py-8 text-center text-sm text-slate-400">Ninguém te deve nada. 🎉</p>
       ) : (
         <ul className="divide-y divide-slate-100 rounded-2xl bg-white shadow-sm">
           {debts.map((d) => (

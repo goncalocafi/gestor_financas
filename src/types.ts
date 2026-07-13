@@ -8,6 +8,10 @@ export const CATEGORIES = [
   "Educação",
   "Compras",
   "Desporto",
+  "Apostas",
+  "Prendas",
+  "Férias",
+  "Saídas à noite",
   "Outros",
 ] as const;
 

@@ -42,6 +42,23 @@ export function listenDebtsByMonth(
   });
 }
 
+/**
+ * Subscreve em tempo real TODOS os empréstimos (todos os meses). Usado na
+ * página "Devem-me" para que uma dívida pendente continue visível mesmo
+ * depois de mudar de mês, até ficar saldada.
+ */
+export function listenAllDebts(uid: string, onChange: (debts: Debt[]) => void): Unsubscribe {
+  const q = query(debtsCol(uid), orderBy("date", "desc"));
+  return onSnapshot(q, (snap) => {
+    onChange(
+      snap.docs.map((d) => {
+        const data = d.data() as Omit<Debt, "id">;
+        return { ...data, id: d.id, payments: data.payments ?? [] };
+      })
+    );
+  });
+}
+
 export async function addDebt(uid: string, input: DebtInput): Promise<void> {
   await addDoc(debtsCol(uid), { ...input, paidAmount: 0, payments: [], createdAt: Date.now() });
 }

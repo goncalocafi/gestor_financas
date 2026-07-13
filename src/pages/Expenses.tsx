@@ -3,7 +3,8 @@ import { ExpenseForm } from "../components/ExpenseForm";
 import { ExpenseList } from "../components/ExpenseList";
 import { useAuth } from "../hooks/useAuth";
 import { useMonthData } from "../hooks/useMonthData";
-import { addExpense, addExpenseInstallments, deleteExpense } from "../services/expenses";
+import { exportExpensesCsv } from "../lib/exportCsv";
+import { addExpense, addExpenseInstallments, deleteExpense, updateExpenseCategory } from "../services/expenses";
 import type { MonthKey } from "../types";
 
 interface Props {
@@ -13,7 +14,7 @@ interface Props {
 
 export function Expenses({ month, onMonthChange }: Props) {
   const { user } = useAuth();
-  const { expenses } = useMonthData(month);
+  const { expenses, fixedInMonth } = useMonthData(month);
 
   if (!user) return null;
 
@@ -28,8 +29,20 @@ export function Expenses({ month, onMonthChange }: Props) {
         }
       />
       <section>
-        <h2 className="mb-2 font-semibold">Histórico do mês</h2>
-        <ExpenseList expenses={expenses} onDelete={(id) => deleteExpense(user.uid, id)} />
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="font-semibold">Histórico do mês</h2>
+          <button
+            onClick={() => exportExpensesCsv(month, expenses, fixedInMonth)}
+            className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+          >
+            ⇩ Exportar CSV
+          </button>
+        </div>
+        <ExpenseList
+          expenses={expenses}
+          onDelete={(id) => deleteExpense(user.uid, id)}
+          onCategoryChange={(id, category) => updateExpenseCategory(user.uid, id, category)}
+        />
       </section>
     </div>
   );

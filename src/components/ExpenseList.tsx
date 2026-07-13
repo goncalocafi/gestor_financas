@@ -1,11 +1,12 @@
-import { formatCurrency, type Expense } from "../types";
+import { CATEGORIES, formatCurrency, type Category, type Expense } from "../types";
 
 interface Props {
   expenses: Expense[];
   onDelete: (id: string) => void;
+  onCategoryChange: (id: string, category: Category) => void;
 }
 
-export function ExpenseList({ expenses, onDelete }: Props) {
+export function ExpenseList({ expenses, onDelete, onCategoryChange }: Props) {
   if (expenses.length === 0) {
     return <p className="py-8 text-center text-sm text-slate-400">Sem despesas registadas neste mês.</p>;
   }
@@ -15,10 +16,18 @@ export function ExpenseList({ expenses, onDelete }: Props) {
         <li key={e.id} className="flex items-center gap-3 p-4">
           <div className="min-w-0 flex-1">
             <p className="truncate font-medium">{e.description}</p>
-            <p className="text-xs text-slate-500">
-              {new Date(e.date + "T00:00").toLocaleDateString("pt-PT")} · {e.category}
-            </p>
+            <p className="text-xs text-slate-500">{new Date(e.date + "T00:00").toLocaleDateString("pt-PT")}</p>
           </div>
+          <select
+            className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs focus:border-indigo-500 focus:outline-none"
+            value={e.category}
+            onChange={(ev) => onCategoryChange(e.id, ev.target.value as Category)}
+            aria-label={`Categoria de ${e.description}`}
+          >
+            {CATEGORIES.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
           <span className="font-semibold">{formatCurrency(e.amount)}</span>
           <button
             onClick={() => onDelete(e.id)}

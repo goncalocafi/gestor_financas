@@ -6,12 +6,13 @@ import {
   onSnapshot,
   orderBy,
   query,
+  updateDoc,
   where,
   writeBatch,
   type Unsubscribe,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import type { Expense, ExpenseInput, MonthKey } from "../types";
+import type { Category, Expense, ExpenseInput, MonthKey } from "../types";
 
 // Dados isolados por utilizador: users/{uid}/expenses/{id}
 const expensesCol = (uid: string) => collection(db, "users", uid, "expenses");
@@ -39,6 +40,10 @@ export async function addExpense(uid: string, input: ExpenseInput): Promise<void
 
 export async function deleteExpense(uid: string, id: string): Promise<void> {
   await deleteDoc(doc(db, "users", uid, "expenses", id));
+}
+
+export async function updateExpenseCategory(uid: string, id: string, category: Category): Promise<void> {
+  await updateDoc(doc(db, "users", uid, "expenses", id), { category });
 }
 
 /** Soma `months` meses a uma data ISO, ajustando o dia se o mês for mais curto. */
