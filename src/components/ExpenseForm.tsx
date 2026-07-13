@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { CATEGORIES, type Category, type ExpenseInput } from "../types";
+import { CATEGORIES, SAVINGS_CATEGORIES, type AnyCategory, type ExpenseInput } from "../types";
 
 interface Props {
   onSubmit: (input: ExpenseInput, installments: number) => Promise<void>;
@@ -11,7 +11,8 @@ export function ExpenseForm({ onSubmit }: Props) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState(today());
-  const [category, setCategory] = useState<Category>("Alimentação");
+  const [category, setCategory] = useState<AnyCategory>("Alimentação");
+  const [isExceptional, setIsExceptional] = useState(false);
   const [installments, setInstallments] = useState(1);
   const [saving, setSaving] = useState(false);
 
@@ -21,10 +22,14 @@ export function ExpenseForm({ onSubmit }: Props) {
     if (!description.trim() || !Number.isFinite(value) || value <= 0) return;
     setSaving(true);
     try {
-      await onSubmit({ description: description.trim(), amount: value, date, category }, installments);
+      await onSubmit(
+        { description: description.trim(), amount: value, date, category, isExceptional },
+        installments
+      );
       setDescription("");
       setAmount("");
       setDate(today());
+      setIsExceptional(false);
       setInstallments(1);
     } finally {
       setSaving(false);
@@ -52,11 +57,22 @@ export function ExpenseForm({ onSubmit }: Props) {
         required
       />
       <input className={input} type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-      <select className={input} value={category} onChange={(e) => setCategory(e.target.value as Category)}>
-        {CATEGORIES.map((c) => (
-          <option key={c}>{c}</option>
-        ))}
+      <select className={input} value={category} onChange={(e) => setCategory(e.target.value as AnyCategory)}>
+        <optgroup label="Despesas">
+          {CATEGORIES.map((c) => (
+            <option key={c}>{c}</option>
+          ))}
+        </optgroup>
+        <optgroup label="Poupança">
+          {SAVINGS_CATEGORIES.map((c) => (
+            <option key={c}>{c}</option>
+          ))}
+        </optgroup>
       </select>
+      <label className="col-span-2 flex items-center gap-2 text-sm text-slate-600">
+        <input type="checkbox" checked={isExceptional} onChange={(e) => setIsExceptional(e.target.checked)} />
+        Despesa excecional (ex: viagem grande) — não conta para tendências
+      </label>
       {/* Pagamento faseado (ex: Klarna): divide o valor total pelos próximos meses */}
       <select
         className={input}

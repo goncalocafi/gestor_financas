@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { CATEGORIES, currentMonthKey, type Category, type FixedExpenseInput } from "../types";
+import { CATEGORIES, SAVINGS_CATEGORIES, currentMonthKey, type AnyCategory, type FixedExpenseInput } from "../types";
 
 interface Props {
   onSubmit: (input: FixedExpenseInput) => Promise<void>;
@@ -8,7 +8,7 @@ interface Props {
 export function FixedExpenseForm({ onSubmit }: Props) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState<Category>("Habitação");
+  const [category, setCategory] = useState<AnyCategory>("Habitação");
   const [startMonth, setStartMonth] = useState(currentMonthKey());
   const [saving, setSaving] = useState(false);
 
@@ -52,10 +52,17 @@ export function FixedExpenseForm({ onSubmit }: Props) {
         onChange={(e) => setAmount(e.target.value)}
         required
       />
-      <select className={input} value={category} onChange={(e) => setCategory(e.target.value as Category)}>
-        {CATEGORIES.map((c) => (
-          <option key={c}>{c}</option>
-        ))}
+      <select className={input} value={category} onChange={(e) => setCategory(e.target.value as AnyCategory)}>
+        <optgroup label="Despesas">
+          {CATEGORIES.map((c) => (
+            <option key={c}>{c}</option>
+          ))}
+        </optgroup>
+        <optgroup label="Poupança">
+          {SAVINGS_CATEGORIES.map((c) => (
+            <option key={c}>{c}</option>
+          ))}
+        </optgroup>
       </select>
       <label className="col-span-2 text-xs text-slate-500">
         Conta a partir de

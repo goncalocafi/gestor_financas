@@ -17,13 +17,24 @@ export const CATEGORIES = [
 
 export type Category = (typeof CATEGORIES)[number];
 
+/** Categorias que representam poupança/investimento, não despesa real */
+export const SAVINGS_CATEGORIES = ["Poupança", "Investimentos"] as const;
+export type SavingsCategory = (typeof SAVINGS_CATEGORIES)[number];
+
+export type AnyCategory = Category | SavingsCategory;
+
+export const isSavingsCategory = (c: AnyCategory): c is SavingsCategory =>
+  (SAVINGS_CATEGORIES as readonly string[]).includes(c);
+
 /** Despesa variável (registo do dia a dia) */
 export interface Expense {
   id: string;
   description: string;
   amount: number;
   date: string; // ISO "YYYY-MM-DD"
-  category: Category;
+  category: AnyCategory;
+  /** Gasto pontual/extraordinário (ex: cruzeiro): não entra nas tendências mensais */
+  isExceptional?: boolean;
   createdAt: number;
 }
 
@@ -34,7 +45,7 @@ export interface FixedExpense {
   id: string;
   description: string;
   amount: number;
-  category: Category;
+  category: AnyCategory;
   /** Primeiro mês em que a despesa conta, formato "YYYY-MM" */
   startMonth: string;
   /** Último mês (inclusive) em que conta; null = ainda ativa */
@@ -85,3 +96,22 @@ export const isFixedActiveInMonth = (f: FixedExpense, month: MonthKey): boolean 
 
 export const formatCurrency = (value: number): string =>
   new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(value);
+
+/** Definições do utilizador: rendimento e meta de poupança mensais */
+export interface UserSettings {
+  monthlyIncome: number;
+  monthlySavingsGoal: number;
+}
+
+export const DEFAULT_SETTINGS: UserSettings = { monthlyIncome: 0, monthlySavingsGoal: 0 };
+
+/** Limite mensal definido por categoria (metas só fazem sentido para categorias de despesa normal) */
+export type BudgetMap = Partial<Record<Category, number>>;
+
+/** Confirmação de que uma despesa fixa foi revista nesse mês (não afeta cálculos) */
+export interface FixedConfirmation {
+  id: string; // "{month}_{fixedExpenseId}"
+  fixedExpenseId: string;
+  month: MonthKey;
+  confirmedAt: number;
+}

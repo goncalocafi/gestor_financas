@@ -4,7 +4,13 @@ import { ExpenseList } from "../components/ExpenseList";
 import { useAuth } from "../hooks/useAuth";
 import { useMonthData } from "../hooks/useMonthData";
 import { exportExpensesCsv } from "../lib/exportCsv";
-import { addExpense, addExpenseInstallments, deleteExpense, updateExpenseCategory } from "../services/expenses";
+import {
+  addExpense,
+  addExpenseInstallments,
+  deleteExpense,
+  updateExpenseCategory,
+  updateExpenseExceptional,
+} from "../services/expenses";
 import type { MonthKey } from "../types";
 
 interface Props {
@@ -42,6 +48,7 @@ export function Expenses({ month, onMonthChange }: Props) {
           expenses={expenses}
           onDelete={(id) => deleteExpense(user.uid, id)}
           onCategoryChange={(id, category) => updateExpenseCategory(user.uid, id, category)}
+          onToggleExceptional={(id, value) => updateExpenseExceptional(user.uid, id, value)}
         />
       </section>
     </div>

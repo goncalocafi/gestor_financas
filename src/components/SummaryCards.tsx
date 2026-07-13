@@ -4,10 +4,11 @@ interface Props {
   totalFixed: number;
   totalVariable: number;
   totalOwed: number;
+  totalSavings: number;
   total: number;
 }
 
-export function SummaryCards({ totalFixed, totalVariable, totalOwed, total }: Props) {
+export function SummaryCards({ totalFixed, totalVariable, totalOwed, totalSavings, total }: Props) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       <div className="rounded-2xl bg-white p-4 shadow-sm">
@@ -22,7 +23,11 @@ export function SummaryCards({ totalFixed, totalVariable, totalOwed, total }: Pr
         <p className="text-sm text-slate-500">Devem-me</p>
         <p className="mt-1 text-2xl font-semibold text-emerald-600">{formatCurrency(totalOwed)}</p>
       </div>
-      <div className="rounded-2xl bg-slate-900 p-4 shadow-sm">
+      <div className="rounded-2xl bg-white p-4 shadow-sm">
+        <p className="text-sm text-slate-500">Poupança/Investimento</p>
+        <p className="mt-1 text-2xl font-semibold text-teal-600">{formatCurrency(totalSavings)}</p>
+      </div>
+      <div className="col-span-2 rounded-2xl bg-slate-900 p-4 shadow-sm sm:col-span-4">
         <p className="text-sm text-slate-300">Total Geral</p>
         <p className="mt-1 text-2xl font-bold text-white">{formatCurrency(total)}</p>
       </div>

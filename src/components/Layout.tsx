@@ -6,6 +6,8 @@ const tabs = [
   { to: "/despesas", label: "Despesas", icon: "🧾" },
   { to: "/fixas", label: "Fixas", icon: "🔁" },
   { to: "/devem-me", label: "Devem-me", icon: "🤝" },
+  { to: "/tendencias", label: "Tendências", icon: "📈" },
+  { to: "/definicoes", label: "Definições", icon: "⚙️" },
 ];
 
 export function Layout() {

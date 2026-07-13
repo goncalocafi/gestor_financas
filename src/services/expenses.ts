@@ -12,7 +12,7 @@ import {
   type Unsubscribe,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import type { Category, Expense, ExpenseInput, MonthKey } from "../types";
+import type { AnyCategory, Expense, ExpenseInput, MonthKey } from "../types";
 
 // Dados isolados por utilizador: users/{uid}/expenses/{id}
 const expensesCol = (uid: string) => collection(db, "users", uid, "expenses");
@@ -42,8 +42,12 @@ export async function deleteExpense(uid: string, id: string): Promise<void> {
   await deleteDoc(doc(db, "users", uid, "expenses", id));
 }
 
-export async function updateExpenseCategory(uid: string, id: string, category: Category): Promise<void> {
+export async function updateExpenseCategory(uid: string, id: string, category: AnyCategory): Promise<void> {
   await updateDoc(doc(db, "users", uid, "expenses", id), { category });
+}
+
+export async function updateExpenseExceptional(uid: string, id: string, isExceptional: boolean): Promise<void> {
+  await updateDoc(doc(db, "users", uid, "expenses", id), { isExceptional });
 }
 
 /** Soma `months` meses a uma data ISO, ajustando o dia se o mês for mais curto. */

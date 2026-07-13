@@ -1,13 +1,17 @@
 import { FixedExpenseForm } from "../components/FixedExpenseForm";
 import { FixedExpenseList } from "../components/FixedExpenseList";
+import { FixedExpensesConfirmation } from "../components/FixedExpensesConfirmation";
 import { useAuth } from "../hooks/useAuth";
 import { useMonthData } from "../hooks/useMonthData";
+import { useFixedConfirmations } from "../hooks/useFixedConfirmations";
 import { addFixedExpense, deleteFixedExpense, endFixedExpense } from "../services/fixedExpenses";
 import { currentMonthKey } from "../types";
 
 export function FixedExpenses() {
   const { user } = useAuth();
-  const { allFixed } = useMonthData(currentMonthKey());
+  const month = currentMonthKey();
+  const { allFixed, fixedInMonth } = useMonthData(month);
+  const { confirmedIds, toggle } = useFixedConfirmations(month);
 
   if (!user) return null;
 
@@ -17,6 +21,7 @@ export function FixedExpenses() {
         As despesas fixas são contabilizadas automaticamente em todos os meses em que estão ativas
         — não precisas de as registar todos os meses.
       </p>
+      <FixedExpensesConfirmation fixedInMonth={fixedInMonth} confirmedIds={confirmedIds} onToggle={toggle} />
       <FixedExpenseForm onSubmit={(input) => addFixedExpense(user.uid, input)} />
       <FixedExpenseList
         items={allFixed}

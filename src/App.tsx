@@ -7,6 +7,8 @@ import { Dashboard } from "./pages/Dashboard";
 import { Expenses } from "./pages/Expenses";
 import { FixedExpenses } from "./pages/FixedExpenses";
 import { Debts } from "./pages/Debts";
+import { Trends } from "./pages/Trends";
+import { Settings } from "./pages/Settings";
 import { currentMonthKey } from "./types";
 
 function AppRoutes() {
@@ -27,6 +29,8 @@ function AppRoutes() {
         <Route path="/despesas" element={<Expenses month={month} onMonthChange={setMonth} />} />
         <Route path="/fixas" element={<FixedExpenses />} />
         <Route path="/devem-me" element={<Debts month={month} onMonthChange={setMonth} />} />
+        <Route path="/tendencias" element={<Trends />} />
+        <Route path="/definicoes" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

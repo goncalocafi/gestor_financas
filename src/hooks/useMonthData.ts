@@ -6,6 +6,7 @@ import { listenDebtsByMonth } from "../services/debts";
 import {
   debtOutstanding,
   isFixedActiveInMonth,
+  isSavingsCategory,
   type Category,
   type Debt,
   type Expense,
@@ -53,13 +54,27 @@ export function useMonthData(month: MonthKey) {
 
   return useMemo(() => {
     const fixedInMonth = allFixed.filter((f) => isFixedActiveInMonth(f, month));
-    const totalFixed = fixedInMonth.reduce((sum, f) => sum + f.amount, 0);
-    const totalVariable = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+    const spendExpenses = expenses.filter((e) => !isSavingsCategory(e.category));
+    const savingsExpenses = expenses.filter((e) => isSavingsCategory(e.category));
+    const spendFixed = fixedInMonth.filter((f) => !isSavingsCategory(f.category));
+    const savingsFixed = fixedInMonth.filter((f) => isSavingsCategory(f.category));
+
+    const totalFixed = spendFixed.reduce((sum, f) => sum + f.amount, 0);
+    const totalVariable = spendExpenses.reduce((sum, e) => sum + e.amount, 0);
     const totalOwed = debts.reduce((sum, d) => sum + debtOutstanding(d), 0);
+    const totalSavings =
+      savingsExpenses.reduce((sum, e) => sum + e.amount, 0) + savingsFixed.reduce((sum, f) => sum + f.amount, 0);
+    const totalExcludingExceptional =
+      totalFixed +
+      spendExpenses.filter((e) => !e.isExceptional).reduce((sum, e) => sum + e.amount, 0) +
+      totalOwed;
 
     const byCategory = new Map<Category | "Empréstimos", number>();
-    for (const e of expenses) byCategory.set(e.category, (byCategory.get(e.category) ?? 0) + e.amount);
-    for (const f of fixedInMonth) byCategory.set(f.category, (byCategory.get(f.category) ?? 0) + f.amount);
+    for (const e of spendExpenses)
+      byCategory.set(e.category as Category, (byCategory.get(e.category as Category) ?? 0) + e.amount);
+    for (const f of spendFixed)
+      byCategory.set(f.category as Category, (byCategory.get(f.category as Category) ?? 0) + f.amount);
     if (totalOwed > 0) byCategory.set("Empréstimos", totalOwed);
 
     return {
@@ -71,6 +86,8 @@ export function useMonthData(month: MonthKey) {
       totalFixed,
       totalVariable,
       totalOwed,
+      totalSavings,
+      totalExcludingExceptional,
       total: totalFixed + totalVariable + totalOwed,
       categoryData: [...byCategory.entries()]
         .map(([name, value]) => ({ name, value }))
