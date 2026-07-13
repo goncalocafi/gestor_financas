@@ -19,7 +19,8 @@ export function UnallocatedBalance({ income, totalVariable, totalFixed, totalSav
         {formatCurrency(unallocated)}
       </p>
       <p className="mt-1 text-xs text-slate-400">
-        Rendimento − despesas fixas e variáveis − poupança deste mês
+        Rendimento − despesas fixas e variáveis − poupança deste mês. Ainda não tem destino
+        definido, mas conta para a meta de poupança abaixo.
       </p>
     </div>
   );

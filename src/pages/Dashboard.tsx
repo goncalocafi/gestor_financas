@@ -40,7 +40,10 @@ export function Dashboard({ month, onMonthChange }: Props) {
               totalFixed={totalFixed}
               totalSavings={totalSavings}
             />
-            <SavingsGoalProgress current={totalSavings} goal={settings.monthlySavingsGoal} />
+            <SavingsGoalProgress
+              current={totalSavings + Math.max(0, settings.monthlyIncome - totalFixed - totalVariable - totalSavings)}
+              goal={settings.monthlySavingsGoal}
+            />
           </div>
           <BudgetProgressList items={budgetItems} />
           <section className="rounded-2xl bg-white p-4 shadow-sm">
