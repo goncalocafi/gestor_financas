@@ -1,7 +1,7 @@
 import { MonthPicker } from "../components/MonthPicker";
 import { SummaryCards } from "../components/SummaryCards";
 import { CategoryChart } from "../components/CategoryChart";
-import { UnallocatedBalance } from "../components/UnallocatedBalance";
+import { IncomeVsSpent } from "../components/IncomeVsSpent";
 import { SavingsGoalProgress } from "../components/SavingsGoalProgress";
 import { BudgetProgressList } from "../components/BudgetProgressList";
 import { useMonthData } from "../hooks/useMonthData";
@@ -34,12 +34,7 @@ export function Dashboard({ month, onMonthChange }: Props) {
             total={total}
           />
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <UnallocatedBalance
-              income={settings.monthlyIncome}
-              totalVariable={totalVariable}
-              totalFixed={totalFixed}
-              totalSavings={totalSavings}
-            />
+            <IncomeVsSpent income={settings.monthlyIncome} spent={totalFixed + totalVariable + totalSavings} />
             <SavingsGoalProgress
               current={totalSavings + Math.max(0, settings.monthlyIncome - totalFixed - totalVariable - totalSavings)}
               goal={settings.monthlySavingsGoal}
